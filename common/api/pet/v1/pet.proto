@@ -1,0 +1,132 @@
+syntax = "proto3";
+
+package pet_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/escoutdoor/kotopes/common/api/pet/v1;pet_v1";
+
+service PetV1 {
+    // Creates a new pet
+    rpc Create(CreateRequest) returns (CreateResponse);
+
+    // Gets a pet by id
+    rpc Get(GetRequest) returns (GetResponse);
+
+    // Gets a list of pets with filters
+    rpc ListPets(ListPetsRequest) returns (ListPetsResponse);
+
+    // Updates a user's pet
+    rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+
+    // Deletes a user's pet
+    rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
+
+message Pet {
+    string id = 1 [(buf.validate.field).string = {uuid:true}];
+    string name = 2 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 50,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string description = 3 [
+        (buf.validate.field).string = {
+            min_len: 1
+        }
+    ];
+    int32 age = 4 [
+        (buf.validate.field).int32 = {
+            gte: 0,
+            lte: 100
+        }
+    ];
+    string owner_id = 5 [(buf.validate.field).string = {uuid: true}];
+    google.protobuf.Timestamp created_at = 6;
+}
+
+message CreateRequest {
+    string name = 1 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 50,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string description = 2 [
+        (buf.validate.field).string = {
+            min_len: 5,
+        }
+    ];
+    int32 age = 3 [
+        (buf.validate.field).int32 = {
+            gte: 0,
+            lte: 100
+        }
+    ];
+    string owner_id = 4 [(buf.validate.field).string = {uuid: true}];
+}
+
+message CreateResponse {
+    string id = 1 [(buf.validate.field).string = {uuid: true}];
+}
+
+message GetRequest {
+    string id = 1 [(buf.validate.field).string = {uuid:true}];
+}
+
+message GetResponse {
+    Pet pet = 1;
+}
+
+message ListPetsRequest {
+    int32 limit = 1 [
+        (buf.validate.field).int32 = {
+            gte: 0,
+            lte: 100
+        }
+    ];
+    int32 offset = 2 [
+        (buf.validate.field).int32 = {
+            gte: 0
+        }
+    ];
+    repeated string pet_ids = 3 [
+        (buf.validate.field).repeated = {
+            unique: true,
+            items: {string: {uuid: true}}
+        }
+    ];
+}
+
+message ListPetsResponse {
+    repeated Pet pets = 1;
+}
+
+message UpdateRequest {
+    string id = 1 [(buf.validate.field).string = {uuid:true}];
+    string owner_id = 2 [(buf.validate.field).string = {uuid:true}];
+    google.protobuf.StringValue name = 3 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 50,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    google.protobuf.StringValue description = 4 [
+        (buf.validate.field).string = {min_len: 1}
+    ];
+    google.protobuf.Int32Value age = 5 [
+        (buf.validate.field).int32 = {gte: 0, lte: 100}
+    ];
+}
+
+message DeleteRequest {
+    string id = 1 [(buf.validate.field).string = {uuid:true}];
+    string owner_id = 2 [(buf.validate.field).string = {uuid:true}];
+}

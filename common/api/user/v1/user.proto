@@ -1,0 +1,133 @@
+syntax = "proto3";
+
+package user_v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/wrappers.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/escoutdoor/kotopes/common/api/user/v1;user_v1";
+
+service UserV1 {
+    // Gets a pet by id.
+    rpc Get(GetRequest) returns (GetResponse);
+
+    // Gets a list of users.
+    rpc List(ListRequest) returns (ListResponse);
+
+    // Updates a user.
+    rpc Update(UpdateRequest) returns (google.protobuf.Empty);
+
+    // Deletes a user.
+    rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
+
+message User { 
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    string first_name = 2 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string last_name = 3 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string email = 4 [(buf.validate.field).string.email = true];
+    string phone = 5 [
+        (buf.validate.field).string = {
+            pattern: "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"
+        }
+    ];
+    string city = 6 [
+        (buf.validate.field).string = {
+            min_len: 2,
+            max_len: 100,
+            pattern: '^[A-Za-z\\s\'-]+$'
+        }
+    ];
+    string country = 7 [
+        (buf.validate.field).string = {
+            min_len: 2,
+            max_len: 100,
+            pattern: '^[A-Za-z\\s\'-]+$'
+        }
+    ];
+    google.protobuf.Timestamp created_at = 8;
+}
+
+message ListRequest {
+    repeated string user_ids = 1 [
+        (buf.validate.field).repeated = {
+            unique: true,
+            items: {string: {uuid: true}}
+        }
+    ];
+}
+
+message ListResponse {
+    repeated User users = 1;
+}
+
+message GetRequest {
+    string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message GetResponse {
+    User user = 1;
+}
+
+message UpdateRequest {
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    google.protobuf.StringValue first_name = 2 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    google.protobuf.StringValue last_name = 3 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    google.protobuf.StringValue email = 4 [(buf.validate.field).string.email = true];
+    google.protobuf.StringValue password = 5 [
+        (buf.validate.field).string = {
+            min_len: 8,
+            max_len: 64,
+            pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=]*$"
+        }
+    ];
+    google.protobuf.StringValue phone = 6 [
+        (buf.validate.field).string = {
+            pattern: "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"
+        }
+    ];
+    google.protobuf.StringValue city = 7 [
+        (buf.validate.field).string = {
+            min_len: 2,
+            max_len: 100,
+            pattern: '^[A-Za-z\\s\'-]+$'
+        }
+    ];
+    google.protobuf.StringValue country = 8 [
+        (buf.validate.field).string = {
+            min_len: 2,
+            max_len: 100,
+            pattern: '^[A-Za-z\\s\'-]+$'
+        }
+    ];
+}
+
+message DeleteRequest {
+    string id = 1 [(buf.validate.field).string.uuid = true];
+}

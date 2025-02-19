@@ -1,0 +1,118 @@
+syntax = "proto3";
+
+package auth_v1;
+
+import "google/protobuf/wrappers.proto";
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/escoutdoor/kotopes/common/api/auth/v1;auth_v1";
+
+service AuthV1 {
+    // Creates user and returns their id.
+    rpc Register(RegisterRequest) returns (RegisterResponse);
+
+    // Verifies credentials and returns access and refresh tokens.
+    rpc Login(LoginRequest) returns (LoginResponse);
+
+    // Generates new access and refresh tokens.
+    rpc Refresh(RefreshRequest) returns (RefreshResponse);
+
+    // Checks the access token and returns user's id and role.
+    rpc Validate(ValidateRequest) returns (ValidateResponse);
+}
+
+message RegisterRequest {
+    string first_name = 1 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string last_name = 2 [
+        (buf.validate.field).string = {
+            min_len: 1,
+            max_len: 20,
+            pattern: "^[\\p{L}0-9 \\-]+$"
+        }
+    ];
+    string email = 3 [(buf.validate.field).string.email = true];
+    string password = 4 [
+        (buf.validate.field).string = {
+            min_len: 8,
+            max_len: 64,
+            pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=]*$"
+        }
+    ];
+    google.protobuf.StringValue phone = 5 [
+        (buf.validate.field).string = {
+            pattern: "^(\\+\\d{1,2}\\s)?\\(?\\d{3}\\)?[\\s.-]\\d{3}[\\s.-]\\d{4}$"
+        }
+    ];
+}
+
+message RegisterResponse {
+    string id = 1 [(buf.validate.field).string.uuid = true];
+}
+
+message LoginRequest {
+    string email = 1 [(buf.validate.field).string.email = true];
+    string password = 2 [
+        (buf.validate.field).string = {
+            min_len: 8,
+            max_len: 64,
+            pattern: "^[a-zA-Z0-9!@#$%^&*()-_+=]*$"
+        }
+    ];
+}
+
+message LoginResponse {
+    string access_token = 1 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+    string refresh_token = 2 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+}
+
+message RefreshRequest {
+    string refresh_token = 1 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+}
+
+message RefreshResponse {
+    string access_token = 1 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+    string refresh_token = 2 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+}
+
+message ValidateRequest {
+    string access_token = 1 [
+        (buf.validate.field).string = {
+            pattern: '^[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+\\.[A-Za-z0-9-_]+$'
+        }
+    ];
+}
+
+message ValidateResponse {
+    string id = 1 [(buf.validate.field).string.uuid = true];
+    string role = 2 [
+        (buf.validate.field).string = {
+            in: ["user", "admin"]
+        }
+    ];
+}

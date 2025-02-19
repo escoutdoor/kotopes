@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<style>
+			body {
+				font-family: Arial, sans-serif;
+				background-color: #f9f9f9;
+				color: #333;
+				margin: 0;
+				padding: 0;
+			}
+			.container {
+				max-width: 600px;
+				margin: 20px auto;
+				background-color: #fff;
+				padding: 20px;
+				border-radius: 8px;
+				border: 1px solid #ddd;
+			}
+			.header {
+				text-align: center;
+				border-bottom: 1px solid #ddd;
+				padding-bottom: 10px;
+				margin-bottom: 20px;
+			}
+			.header h1 {
+				margin: 0;
+				color: #000;
+			}
+			.content p {
+				line-height: 1.6;
+				font-size: 1.1em;
+			}
+			.footer {
+				text-align: center;
+				margin-top: 20px;
+				font-size: 0.9em;
+				color: #777;
+			}
+			.profile-link {
+				display: inline-block;
+				margin-top: 10px;
+				padding: 10px 15px;
+				background-color: #000;
+				color: #fff !important;
+				text-decoration: none;
+				border-radius: 5px;
+				transition: background-color 0.3s;
+			}
+			.profile-link:hover {
+				background-color: #333;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="container">
+			<div class="header">
+				<h1>Hello, {{.FirstName}} {{.LastName}}</h1>
+			</div>
+			<div class="content">
+				<p>
+					We are excited to inform you that your pet has been added to
+					another user's favorite list.
+				</p>
+				<p>
+					If you would like to contact this user, you can visit their
+					profile:
+				</p>
+				<p>
+					<a
+						class="profile-link"
+						href="https://kotopes.com/profile/{{.UserID}}"
+						>View User Profile</a
+					>
+				</p>
+			</div>
+			<div class="footer">
+				<p>Thank you for using our service!</p>
+			</div>
+		</div>
+	</body>
+</html>

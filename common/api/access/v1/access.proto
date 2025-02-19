@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "buf/validate/validate.proto";
+
+option go_package = "github.com/escoutdoor/kotopes/common/api/access/v1;access_v1";
+
+service AccessV1 {
+    // Checks if a user has access to the resource
+    rpc CheckIsAllowed(CheckRequest) returns (CheckResponse);
+}
+
+message CheckRequest {
+    string endpoint = 1 [
+        (buf.validate.field).string = {
+            pattern: "^/[a-zA-Z0-9/{}._*-]+$"
+        }
+    ];
+    string method = 2 [
+        (buf.validate.field).string = {
+            in: [
+                "POST",
+                "PUT",
+                "PATCH",
+                "GET",
+                "DELETE"
+            ]
+        }
+    ];
+    string user_id = 3 [(buf.validate.field).string.uuid = true];
+    string role = 4 [ 
+        (buf.validate.field).string = {
+            in: ["user", "admin"]
+        }
+    ];
+}
+
+message CheckResponse {
+    bool is_allowed = 1;
+}
